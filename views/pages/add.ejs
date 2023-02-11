@@ -1,0 +1,101 @@
+<%- include('../parties/header') %>
+
+<script>
+    // import transportConfig from 
+    // const transportConfig = require('../../utils/transportConfig')
+    // console.log(transportConfig);
+
+    const handleAccept = async (id,data,email) =>{
+        //accept > remove from checkpoint and save in centre table then send emai to it
+        await fetch(`/admin/checkpoint/${id}/remove`,{
+            method:'DELETE'
+        })
+        
+        await fetch('/centres',{
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body:data
+        })
+
+        await fetch(`/admin/request/mail?email=${email}`,{
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify({
+                messageDetails:"your centre registration request was accepted. now you can sign in and explore the featuers"
+            })
+        })
+    }
+
+    const handleReject = async (id,email) =>{
+        await fetch(`/admin/request/mail?email=${email}`,{
+                method:'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body:JSON.stringify({
+                    messageDetails:"your centre registration request was Rjected.\n your data doesn't follow our standards. \n please try again or contact help"
+                })
+        })
+
+        await fetch(`/admin/checkpoint/${id}/remove`,{
+            method:'DELETE'
+        }).then(() => alert('delet'))
+    }
+
+    const test = (x) => console.log(x);
+</script>
+
+
+
+<div class="container">
+
+
+    <div class="product-display">
+        <table class="product-display-table">
+            <thead>
+            <tr>
+                <th>checkpoint id</th>
+                <th>laboratory data</th>
+<!--                <th> laboratory location</th>-->
+
+                <th colspan="2"> action </th>
+            </tr>
+            </thead>
+
+
+            <% centres.forEach(centre => { %>
+                <tr>
+                    <% var data = JSON.parse(centre.data) %>
+                    <td><%= centre.id%></td>
+                    <td>
+                        <span>name: <%= data.placename %></span><br>
+                        <span>description: <%= data.description %></span><br>
+                        <span>email <%= data.email %></span><br>
+                        <span>tests: <%= data.tests %></span><br>
+                        <span>branches: <%= data.branches %></span><br>
+                        <span>open time: <%= data['open_time'] %></span><br>
+                        <span>close time: <%= data['close_time'] %></span><br>
+                        <span>location: <%= JSON.stringify(data['location']) %></span><br>
+                    </td>
+                    <td>
+                        <div class="btn-admin" onclick="handleAccept('<%= centre.id %>','<%= JSON.stringify(data) %>','<%= data.email %>')"> <i class="fas fa-check"></i> Accept </div>
+                        <div class="btn-admin" onclick="handleReject('<%= centre.id %>','<%= data.email %>')"><i class="fa-solid fa-xmark"></i> Reject </div>
+                    </td>
+                </tr>
+
+            <% }) %>
+
+        </table>
+    </div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+<%- include('../parties/header') %>
+
+<div class="container">
+    <div class="product-display">
+        <table class="product-display-table">
+            <thead>
+            <tr>
+                <th>laboratory name</th>
+                <th> laboratory location</th>
+
+                <th>action</th>
+            </tr>
+            </thead>
+
+            <% centres.forEach(function(centre){ %>
+                <tr>
+                    <td><%= centre.placename %></td>
+                    <td><%= centre.branches %></td>
+                    <td>
+                        <a href="/admin/centres/<%= centre.id %>/delete" class="btn-admin"> <i class="fas fa-trash"></i> delete </a>
+                    </td>
+                </tr>
+            <% }) %>
+
+        </table>
+    </div>
+
+</div>
+
+
+<%- include('../parties/footer') %>
